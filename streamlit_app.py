@@ -21,7 +21,7 @@ tables = pd.read_html(url)
 
 # Display the data as a table using `st.dataframe`.
 st.dataframe(
-    tables,
+    tables[0],
     use_container_width=True,
     #column_config={"year": st.column_config.TextColumn("Year")},
 )
