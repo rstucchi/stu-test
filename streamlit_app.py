@@ -15,3 +15,10 @@ st.write(
 # Read table
 url = r'https://www.asfautolinee.it/subpage_orari_osm.php?lang=it&linea=N_1&direzione=1&fermata=COMO_A07'
 tables = pd.read_html(url)
+
+# Display the data as a table using `st.dataframe`.
+st.dataframe(
+    tables,
+    use_container_width=True,
+    #column_config={"year": st.column_config.TextColumn("Year")},
+)
