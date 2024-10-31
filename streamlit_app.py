@@ -1,6 +1,17 @@
+import altair as alt
+import pandas as pd
 import streamlit as st
+import lxml
 
-st.title("🎈 My new app")
+# Show the page title and description.
+st.set_page_config(page_title="Orario bus", page_icon="🚌")
+st.title("🚌 Orario bus")
 st.write(
-    "Let's start building! For help and inspiration, head over to [docs.streamlit.io](https://docs.streamlit.io/)."
+    """
+    ASF autolinee
+    """
 )
+
+# Read table
+url = r'https://www.asfautolinee.it/subpage_orari_osm.php?lang=it&linea=N_1&direzione=1&fermata=COMO_A07'
+tables = pd.read_html(url)
