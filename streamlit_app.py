@@ -2,6 +2,9 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 import lxml
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 # Show the page title and description.
 st.set_page_config(page_title="Orario bus", page_icon="🚌")
