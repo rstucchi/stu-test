@@ -1,7 +1,6 @@
 import altair as alt
 import pandas as pd
 import streamlit as st
-import lxml
 
 # Show the page title and description.
 st.set_page_config(page_title="Orario bus", page_icon="🚌")
