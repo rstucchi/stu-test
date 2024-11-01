@@ -74,9 +74,9 @@ st.write(
 )
 
 b1, b2, b3 = st.columns(3)
-if b1.button("Rosales➜Chiasso", use_container_width=True):
+if b1.button("💼 Rosales➜Chiasso", use_container_width=True):
     update_dataframe(direzione = '2', fermata = 'AURORR01')
-if b2.button("Rosales➜Como", use_container_width=True):
-    update_dataframe(direzione = '1', fermata = 'AURORA01')
-if b3.button("Chiasso➜Rosales (in arrivo)", use_container_width=True):
+if b2.button("🏠 Chiasso➜Rosales (in arrivo)", use_container_width=True):
     update_dataframe(direzione = '2', fermata = 'PCHIAR08')
+if b3.button("🏢 Rosales➜Como", use_container_width=True):
+    update_dataframe(direzione = '1', fermata = 'AURORA01')
