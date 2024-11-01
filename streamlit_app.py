@@ -12,7 +12,7 @@ def edit_table(row):
 
 def edit_table_2(row):
     if str(row['Ritardo']) == '0.0':
-        return tim.strftime('%H:%M')
+        return '0'
     elif str(row['Ritardo']) == 'nan':
         return '-'
     else:
@@ -20,7 +20,6 @@ def edit_table_2(row):
 
 def edit_table_3(row):
     tim = datetime.datetime.strptime(row['Orario_previsto'], '%H:%M').time()
-    print(repr(str(row['Ritardo'])))
     if str(row['Ritardo']) == '0.0':
         return tim.strftime('%H:%M')
     elif str(row['Ritardo']) == 'nan':
@@ -74,8 +73,10 @@ st.write(
     """
 )
 
-left, right = st.columns(2)
-if left.button("Rosales➜Chiasso", use_container_width=True):
+b1, b2, b3 = st.columns(3)
+if b1.button("Rosales➜Chiasso", use_container_width=True):
     update_dataframe(direzione = '2', fermata = 'AURORR01')
-if right.button("Rosales➜Como", use_container_width=True):
+if b2.button("Rosales➜Como", use_container_width=True):
     update_dataframe(direzione = '1', fermata = 'AURORA01')
+if b3.button("Chiasso➜Rosales (in arrivo)", use_container_width=True):
+    update_dataframe(direzione = '2', fermata = 'PCHIAR08')
