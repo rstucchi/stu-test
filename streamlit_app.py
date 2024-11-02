@@ -4,21 +4,22 @@ import lxml
 import ssl
 import datetime
 import numpy as np
+from pytz import timezone
 
-def edit_table(row):
+def calc_orario_prev(row):
     dum = row['Orario'].split()[1]
     items = dum.split(':')
     return items[0]+':'+items[1]
 
-def edit_table_2(row):
+def calc_ritardo(row):
     if str(row['Ritardo']) == '0.0':
-        return '0'
+        return '0 min'
     elif str(row['Ritardo']) == 'nan':
         return '-'
     else:
-        return row['Ritardo'].replace(' min.', '')
+        return row['Ritardo'].replace(' min.', '')+' min'
 
-def edit_table_3(row):
+def calc_orario_eff(row):
     tim = datetime.datetime.strptime(row['Orario_previsto'], '%H:%M').time()
     if str(row['Ritardo']) == '0.0':
         return tim.strftime('%H:%M')
@@ -28,37 +29,55 @@ def edit_table_3(row):
         rit = int(row['Ritardo'].replace(' min.', ''))
         new_tim = datetime.datetime.combine(datetime.date.today(), tim) + datetime.timedelta(minutes=rit)
         return new_tim.strftime('%H:%M')
-
+    
+def calc_in_arrivo(row):
+    if row['Orario_effettivo'] == '-':
+        return '-'
+    else:
+        tim = datetime.datetime.strptime(row['Orario_effettivo'], '%H:%M').time()
+        new_tim = datetime.datetime.combine(datetime.date.today(), tim)
+        tim2 = datetime.datetime.now(timezone('Europe/Rome'))
+        new_tim_str = new_tim.strftime('%d.%m.%Y %H:%M')
+        print(new_tim_str)
+        tim2_str = tim2.strftime('%d.%m.%Y %H:%M')
+        print(tim2_str)
+        delta = datetime.datetime.strptime(new_tim_str, '%d.%m.%Y %H:%M') - datetime.datetime.strptime(tim2_str, '%d.%m.%Y %H:%M')
+        return str(int(delta.total_seconds()/60)) + ' min'
+    
 def color_text(val):
-
-    if val == '-':
+    val_check = val.replace(' min', '')
+    if val_check == '-':
         color = 'black'
-    elif int(val) > 0:
+    elif int(val_check) > 0:
         color = 'red'
     else:
         color = 'green'
     return 'color: %s' % color
 
+def font_bold(val):
+    #return 'font-weight: bold'
+    return 'background-color: lemonchiffon'
+
 def update_dataframe(direzione, fermata):
     # Read table
-    #url = r'https://www.asfautolinee.it/subpage_orari_osm.php?lang=it&linea=N_1&direzione=1&fermata=COMO_A07'
     url = r'https://www.asfautolinee.it/subpage_orari_osm.php?lang=it&linea=N_1&direzione='+direzione+'&fermata='+fermata
     tables = pd.read_html(url)
 
     df = tables[0].iloc[:5]
 
-    df['Orario_previsto'] = df.apply(lambda row: edit_table(row), axis=1)
-    df['Ritardo_new'] = df.apply(lambda row: edit_table_2(row), axis=1)
-    df['Orario_effettivo'] = df.apply(lambda row: edit_table_3(row), axis=1)
+    df['Orario_previsto'] = df.apply(lambda row: calc_orario_prev(row), axis=1)
+    df['Ritardo_new'] = df.apply(lambda row: calc_ritardo(row), axis=1)
+    df['Orario_effettivo'] = df.apply(lambda row: calc_orario_eff(row), axis=1)
+    df['In_arrivo'] = df.apply(lambda row: calc_in_arrivo(row), axis=1)
 
-    df = df.drop(['Orario', 'Ritardo'], axis=1)
+    df = df.drop(['Orario', 'Ritardo', 'Orario_effettivo'], axis=1)
 
     # Display the data as a table using `st.dataframe`.
     st.dataframe(
-        df.style.applymap(color_text, subset=['Ritardo_new']),
+        df.style.applymap(color_text, subset=['Ritardo_new']).applymap(font_bold, subset=['In_arrivo']),
         use_container_width=True,
         hide_index=True,
-        column_config={"Orario_previsto": st.column_config.TextColumn("Orario previsto"), "Ritardo_new": st.column_config.TextColumn("Ritardo"), "Orario_effettivo": st.column_config.TextColumn("Orario effettivo")},
+        column_config={"Orario_previsto": st.column_config.TextColumn("Orario previsto"), "Ritardo_new": st.column_config.TextColumn("Ritardo"), "In_arrivo": st.column_config.TextColumn("In arrivo tra")},
     )
 
 # To not have an error
