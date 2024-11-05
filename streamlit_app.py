@@ -62,15 +62,20 @@ def update_dataframe(direzione, fermata):
     # Read table
     url = r'https://www.asfautolinee.it/subpage_orari_osm.php?lang=it&linea=N_1&direzione='+direzione+'&fermata='+fermata
     tables = pd.read_html(url)
-
     df = tables[0].iloc[:5]
 
-    df['Orario_previsto'] = df.apply(lambda row: calc_orario_prev(row), axis=1)
-    df['Ritardo_new'] = df.apply(lambda row: calc_ritardo(row), axis=1)
-    df['Orario_effettivo'] = df.apply(lambda row: calc_orario_eff(row), axis=1)
-    df['In_arrivo'] = df.apply(lambda row: calc_in_arrivo(row), axis=1)
+    if 'Nessun dato presente in tabella' in df.values:
 
-    df = df.drop(['Orario', 'Ritardo', 'Orario_effettivo'], axis=1)
+        df =pd.DataFrame(columns=['Orario_previsto','Ritardo_new','In_arrivo'])
+
+    else:
+
+        df['Orario_previsto'] = df.apply(lambda row: calc_orario_prev(row), axis=1)
+        df['Ritardo_new'] = df.apply(lambda row: calc_ritardo(row), axis=1)
+        df['Orario_effettivo'] = df.apply(lambda row: calc_orario_eff(row), axis=1)
+        df['In_arrivo'] = df.apply(lambda row: calc_in_arrivo(row), axis=1)
+
+        df = df.drop(['Orario', 'Ritardo', 'Orario_effettivo'], axis=1)
 
     # Display the data as a table using `st.dataframe`.
     st.dataframe(
